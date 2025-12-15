@@ -5,182 +5,192 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cloud 9 Ice Cream</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f6f9ff;
-      color: #222;
-    }
+    body { margin:0; font-family:Arial, sans-serif; background:#f6f9ff; color:#222; }
     header {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      padding: 30px 20px;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display:flex; justify-content:center; align-items:center;
+      padding:30px 20px; background:white;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      position:relative;
     }
-    .logo {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #a5c9ff, #e0eaff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-    main {
-      padding: 30px;
-      max-width: 1100px;
-      margin: auto;
-    }
-    .product {
-      display: flex;
-      gap: 30px;
-      margin-bottom: 30px;
-    }
-    .product img {
-      width: 50%;
-      border-radius: 12px;
-      object-fit: cover;
-      background: #ddd;
-    }
-    .options {
-      width: 50%;
-    }
-    h2 {
-      margin-top: 0;
-    }
-    .section {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin: 6px 0;
-    }
-    .total {
-      font-size: 20px;
-      font-weight: bold;
-      margin: 20px 0;
-    }
+    .brand { display:flex; align-items:center; gap:16px; }
+    main { padding:30px; max-width:1100px; margin:auto; }
+    .product { display:flex; gap:30px; margin-bottom:30px; }
+    .product img { width:50%; border-radius:12px; object-fit:cover; background:#ddd; }
+    .options { width:50%; }
+    .section { margin-bottom:20px; }
+    label { display:block; margin:6px 0; }
+    .total { font-size:20px; font-weight:bold; margin:20px 0; }
     button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background: #5b8cff;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
+      padding:12px 24px; border:none; border-radius:8px;
+      background:#5b8cff; color:white; font-size:16px; cursor:pointer;
     }
-    button:hover {
-      background: #3f6fe0;
-    }
-    .nutrition {
-      margin-top: 40px;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      min-height: 200px;
+    button:hover { background:#3f6fe0; }
+    .nutrition { margin-top:40px; padding:20px; background:white; border-radius:12px; }
+    #cart {
+      position:fixed; top:0; right:-320px; width:300px; height:100%;
+      background:white; box-shadow:-2px 0 10px rgba(0,0,0,0.2);
+      padding:20px; z-index:1000; transition:right 0.3s ease;
+      display:flex; flex-direction:column;
     }
   </style>
 </head>
 <body>
-  <header>
+
+<header>
+  <div class="brand">
     <img src="logo.png" alt="Cloud 9 Logo" style="width:90px;height:90px;border-radius:50%;object-fit:cover;">
     <h1 style="margin:0;">Cloud 9 Ice Cream</h1>
-  </header>
+  </div>
+  <div style="position:fixed; top:30px; right:30px; cursor:pointer; display:flex; align-items:center; z-index:1100;" onclick="toggleCart()">
+    <span style="font-size:26px;">🛒</span>
+    <span id="cartBadge" style="margin-left:6px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">0</span>
+  </div>
+</header>
 
-  <main>
-    <div class="product">
-      <img id="iceCreamImage" src="mango.png" alt="Ice Cream" />
+<div id="cart">
+  <h2>Cart</h2>
+  <div id="cartContent" style="flex:1; overflow-y:auto; margin-bottom:12px;"></div>
+  <p><strong>Total: €<span id="cartTotal">0.00</span></strong></p>
+  <button onclick="checkout()">Checkout</button>
+</div>
 
-      <div class="options">
-        <div class="section">
-          <h2>Choose flavour</h2>
-          <label><input type="radio" name="flavour" checked onclick="setFlavour('Mangolicious')"> Mangolicious</label>
-          <label><input type="radio" name="flavour" onclick="setFlavour('Vanila Cloud')"> Vanila Cloud</label>
-          <label><input type="radio" name="flavour" onclick="setFlavour('Blueberry Drizzle')"> Blueberry Drizzle</label>
-        </div>
+<main>
+  <div class="product">
+    <img id="iceCreamImage" src="mango.png" alt="Ice Cream" />
 
-        <div class="section">
-          <h2>Toppings (€0.50 each)</h2>
-          <label><input type="checkbox" class="topping" onchange="updateTotal()"> Sprinkles</label>
-          <label><input type="checkbox" class="topping" onchange="updateTotal()"> Frozen berries</label>
-          <label><input type="checkbox" class="topping" onchange="updateTotal()"> Coconut flakes</label>
-          <label><input type="checkbox" class="topping" onchange="updateTotal()"> Dark chocolate chips</label>
-          <label><input type="checkbox" class="topping" onchange="updateTotal()"> Almond pieces</label>
-          <label><input type="checkbox" class="topping" onchange="updateTotal()"> Honey crunch</label>
-        </div>
-
-        <div class="section">
-          <h2>Sauces (€0.70 each)</h2>
-          <label><input type="checkbox" class="sauce" onchange="updateTotal()"> Chocolate</label>
-          <label><input type="checkbox" class="sauce" onchange="updateTotal()"> Strawberry</label>
-        </div>
-
-        <div class="total">Total: €<span id="total">5.00</span></div>
-        <button>Order now</button>
+    <div class="options">
+      <div class="section">
+        <h2>Choose flavour</h2>
+        <label><input type="radio" name="flavour" checked onclick="setFlavour('Mangolicious')"> Mangolicious</label>
+        <label><input type="radio" name="flavour" onclick="setFlavour('Vanilla Cloud')"> Vanilla Cloud</label>
+        <label><input type="radio" name="flavour" onclick="setFlavour('Blueberry Drizzle')"> Blueberry Drizzle</label>
       </div>
-    </div>
 
-    <div class="nutrition">
-      <h2>Nutritional Facts</h2>
-      <div style="display:flex; gap:40px;">
-        <div>
-          <p><strong>Mangolicious:</strong><br>
-          Protein: 46g<br>
-          Calories: 240<br>
-          Vitamins: 35<br>
-          Ingredients: mango, milk, protein powder</p>
-        </div>
-        <div>
-          <p><strong>Blueberry Drizzle:</strong><br>
-          Protein: 25g<br>
-          Calories: 260<br>
-          Vitamins: 30<br>
-          Ingredients: blueberry, milk, protein powder</p>
-        </div>
-        <div>
-          <p><strong>Vanilla Cloud:</strong><br>
-          Protein: 60g<br>
-          Calories: 280<br>
-          Vitamins: 15<br>
-          Ingredients: vanilla, xanthan gum, milk, protein powder</p>
-        </div>
+      <div class="section">
+        <h2>Toppings (€0.50 each)</h2>
+        <label><input type="checkbox" class="topping" onchange="updateTotal()"> Sprinkles</label>
+        <label><input type="checkbox" class="topping" onchange="updateTotal()"> Frozen berries</label>
+        <label><input type="checkbox" class="topping" onchange="updateTotal()"> Coconut flakes</label>
+        <label><input type="checkbox" class="topping" onchange="updateTotal()"> Dark chocolate chips</label>
+        <label><input type="checkbox" class="topping" onchange="updateTotal()"> Almond pieces</label>
+        <label><input type="checkbox" class="topping" onchange="updateTotal()"> Honey crunch</label>
       </div>
+
+      <div class="section">
+        <h2>Sauces (€0.70 each)</h2>
+        <label><input type="checkbox" class="sauce" onchange="updateTotal()"> Chocolate</label>
+        <label><input type="checkbox" class="sauce" onchange="updateTotal()"> Strawberry</label>
+      </div>
+
+      <div class="total">Total: €<span id="total">5.00</span></div>
+      <button style="margin-left:80px;" onclick="addToCart()">Add to cart</button>
     </div>
-  </main>
+  </div>
 
-  <script>
-    function setFlavour(name) {
-      const img = document.getElementById('iceCreamImage');
+  <div class="nutrition">
+    <h2>Nutritional Facts</h2>
+    <div style="display:flex; gap:40px;">
+      <div><strong>Mangolicious:</strong><br>Protein:46g<br>Calories:240<br>Vitamins:35<br>Ingredients:mango, milk, protein powder</div>
+      <div><strong>Blueberry Drizzle:</strong><br>Protein:25g<br>Calories:260<br>Vitamins:30<br>Ingredients:blueberry, milk, protein powder</div>
+      <div><strong>Vanilla Cloud:</strong><br>Protein:60g<br>Calories:280<br>Vitamins:15<br>Ingredients:vanilla, xanthan gum, milk, protein powder</div>
+    </div>
+  </div>
+</main>
 
-      if (name === 'Mangolicious') {
-        img.src = 'mango.png';
-      } else if (name === 'Vanila Cloud') {
-        img.src = 'vanilla.png';
-      } else if (name === 'Blueberry Drizzle') {
-        img.src = 'blueberry.png';
-      }
+<script>
+  let cartItems = [];
+  let selectedFlavour = 'Mangolicious';
+
+  function setFlavour(name) {
+    selectedFlavour = name;
+    const img = document.getElementById('iceCreamImage');
+    if (name === 'Mangolicious') img.src = 'mango.png';
+    if (name === 'Vanilla Cloud') img.src = 'vanilla.png';
+    if (name === 'Blueberry Drizzle') img.src = 'blueberry.png';
+  }
+
+  function updateTotal() {
+    let total = 5.0;
+    document.querySelectorAll('.topping:checked').forEach(() => total += 0.5);
+    document.querySelectorAll('.sauce:checked').forEach(() => total += 0.7);
+    document.getElementById('total').textContent = total.toFixed(2);
+    return total;
+  }
+
+  function addToCart() {
+    // add current selection WITHOUT replacing existing cart items
+
+    const toppingsEls = document.querySelectorAll('.topping');
+    const sauceEls = document.querySelectorAll('.sauce');
+
+    const toppings = [...document.querySelectorAll('.topping:checked')]
+      .map(t => t.parentElement.textContent.trim());
+    const sauces = [...document.querySelectorAll('.sauce:checked')]
+      .map(s => s.parentElement.textContent.trim());
+
+    const price = updateTotal();
+
+    cartItems.push({ flavour: selectedFlavour, toppings, sauces, price });
+    renderCart();
+    updateBadge();
+    openCart();
+
+    // reset selections after adding to cart
+    toppingsEls.forEach(t => t.checked = false);
+    sauceEls.forEach(s => s.checked = false);
+    updateTotal();
+  }
+
+  function renderCart() {
+    const cart = document.getElementById('cartContent');
+    cart.innerHTML = '';
+    let total = 0;
+
+    cartItems.forEach((item, index) => {
+      total += item.price;
+      cart.innerHTML += `<div style="margin-bottom:12px;">
+        <p><strong>${item.flavour}</strong><br>${[...item.toppings, ...item.sauces].join(', ')}<br>€${item.price.toFixed(2)}</p>
+        <button onclick="removeItem(${index})">Remove</button>
+      </div>`;
+    });
+
+    document.getElementById('cartTotal').textContent = total.toFixed(2);
+  }
+
+  function toggleCart() {
+    const cart = document.getElementById('cart');
+    cart.style.right = cart.style.right === '0px' ? '-320px' : '0px';
+  }
+
+  function openCart() {
+    const cart = document.getElementById('cart');
+    cart.style.right = '0px';
+  }
+
+  function removeItem(index) {
+    cartItems.splice(index, 1);
+    renderCart();
+    updateBadge();
+  }
+
+  function updateBadge() {
+    const badge = document.getElementById('cartBadge');
+    if (cartItems.length > 0) {
+      badge.style.display = 'inline-block';
+      badge.textContent = cartItems.length;
+    } else {
+      badge.style.display = 'none';
     }
+  }
 
-    function updateTotal() {
-      let total = 5.0;
+  function checkout() {
+    document.getElementById('cartContent').innerHTML = '<p><strong>Thank you for your purchase</strong></p>';
+    document.getElementById('cartTotal').textContent = '0.00';
+    cartItems = [];
+    updateBadge();
+  }
 
-      document.querySelectorAll('.topping:checked').forEach(() => {
-        total += 0.5;
-      });
-
-      document.querySelectorAll('.sauce:checked').forEach(() => {
-        total += 0.7;
-      });
-
-      document.getElementById('total').textContent = total.toFixed(2);
-    }
-
-    document.addEventListener('DOMContentLoaded', updateTotal);
-  </script>
+  document.addEventListener('DOMContentLoaded', () => updateTotal());
+</script>
 </body>
 </html>
